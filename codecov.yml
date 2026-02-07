@@ -1,0 +1,28 @@
+# Codecov Configuration
+
+coverage:
+  status:
+    project:
+      default:
+        # Allow coverage to be low while we're building the project
+        target: 10%
+        threshold: 5%
+        base: auto
+    patch:
+      default:
+        target: 5%
+        threshold: 5%
+
+ignore:
+  - "*/tests/*"
+  - "*/__init__.py"
+
+comment:
+  layout: "reach,diff,flags,files,footer"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+github_checks:
+  annotations: true
