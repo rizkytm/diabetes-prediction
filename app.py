@@ -8,23 +8,23 @@ Author: Claude Code
 Date: 2026-02-07
 """
 
-import streamlit as st
-import pandas as pd
-import numpy as np
-import joblib
 import os
-from pathlib import Path
+
+import joblib
+import pandas as pd
+import streamlit as st
 
 # Page config
 st.set_page_config(
     page_title="Diabetes Prediction",
     page_icon=":",
     layout="centered",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 # Custom CSS
-st.markdown("""
+st.markdown(
+    """
 <style>
     .main-header {
         font-size: 3rem;
@@ -59,10 +59,13 @@ st.markdown("""
         background: linear-gradient(90deg, #51cf66 0%, #ffd43b 50%, #ff6b6b 100%);
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 
 # ==================== LOAD MODELS ====================
+
 
 @st.cache_resource
 def load_models():
@@ -78,8 +81,8 @@ def load_models():
     """
     try:
         # Load preprocessing pipeline
-        pipeline_path = 'models/preprocessing_pipeline.pkl'
-        model_path = 'models/best_model.pkl'
+        pipeline_path = "models/preprocessing_pipeline.pkl"
+        model_path = "models/best_model.pkl"
 
         if not os.path.exists(pipeline_path):
             st.error("Preprocessing pipeline not found. Please run training first.")
@@ -100,6 +103,7 @@ def load_models():
 
 
 # ==================== PREDICTION FUNCTION ====================
+
 
 def predict_diabetes(pipeline, model, input_data):
     """
@@ -131,7 +135,7 @@ def predict_diabetes(pipeline, model, input_data):
     prediction = model.predict(input_processed)[0]
 
     # Get probability
-    if hasattr(model, 'predict_proba'):
+    if hasattr(model, "predict_proba"):
         probability = model.predict_proba(input_processed)[0, 1]
     else:
         probability = float(prediction)
@@ -141,12 +145,14 @@ def predict_diabetes(pipeline, model, input_data):
 
 # ==================== MAIN APP ====================
 
+
 def main():
     """Main application."""
 
     # Header
-    st.markdown('<h1 class="main-header">[Diabetes] Prediction</h1>',
-                unsafe_allow_html=True)
+    st.markdown(
+        '<h1 class="main-header">[Diabetes] Prediction</h1>', unsafe_allow_html=True
+    )
     st.markdown("---")
 
     # Load models
@@ -203,7 +209,7 @@ def main():
                 min_value=0,
                 max_value=20,
                 value=1,
-                help="Number of times pregnant"
+                help="Number of times pregnant",
             )
 
             glucose = st.number_input(
@@ -211,7 +217,7 @@ def main():
                 min_value=0,
                 max_value=300,
                 value=120,
-                help="Plasma glucose concentration after 2 hours in OGTT"
+                help="Plasma glucose concentration after 2 hours in OGTT",
             )
 
             blood_pressure = st.number_input(
@@ -219,7 +225,7 @@ def main():
                 min_value=0,
                 max_value=200,
                 value=70,
-                help="Diastolic blood pressure"
+                help="Diastolic blood pressure",
             )
 
             skin_thickness = st.number_input(
@@ -227,7 +233,7 @@ def main():
                 min_value=0,
                 max_value=100,
                 value=20,
-                help="Triceps skin fold thickness"
+                help="Triceps skin fold thickness",
             )
 
         with col2:
@@ -238,7 +244,7 @@ def main():
                 min_value=0,
                 max_value=1000,
                 value=80,
-                help="2-Hour serum insulin"
+                help="2-Hour serum insulin",
             )
 
             bmi = st.number_input(
@@ -247,7 +253,7 @@ def main():
                 max_value=70.0,
                 value=32.0,
                 step=0.1,
-                help="Body mass index (weight in kg / height in m^2)"
+                help="Body mass index (weight in kg / height in m^2)",
             )
 
             dpf = st.number_input(
@@ -256,7 +262,7 @@ def main():
                 max_value=3.0,
                 value=0.5,
                 step=0.01,
-                help="Diabetes genetic risk score"
+                help="Diabetes genetic risk score",
             )
 
             age = st.number_input(
@@ -264,25 +270,26 @@ def main():
                 min_value=21,
                 max_value=100,
                 value=33,
-                help="Age in years"
+                help="Age in years",
             )
 
         # Submit button
-        submit = st.form_submit_button("[Predict] Diabetes Risk",
-                                       use_container_width=True)
+        submit = st.form_submit_button(
+            "[Predict] Diabetes Risk", use_container_width=True
+        )
 
     # Prediction
     if submit:
         # Prepare input data
         input_data = {
-            'Pregnancies': pregnancies,
-            'Glucose': glucose,
-            'BloodPressure': blood_pressure,
-            'SkinThickness': skin_thickness,
-            'Insulin': insulin,
-            'BMI': bmi,
-            'DiabetesPedigreeFunction': dpf,
-            'Age': age
+            "Pregnancies": pregnancies,
+            "Glucose": glucose,
+            "BloodPressure": blood_pressure,
+            "SkinThickness": skin_thickness,
+            "Insulin": insulin,
+            "BMI": bmi,
+            "DiabetesPedigreeFunction": dpf,
+            "Age": age,
         }
 
         # Make prediction
@@ -294,20 +301,27 @@ def main():
 
         # Prediction
         if prediction == 1:
-            st.markdown('<div class="result-positive">[!] High Risk of Diabetes</div>',
-                       unsafe_allow_html=True)
+            st.markdown(
+                '<div class="result-positive">[!] High Risk of Diabetes</div>',
+                unsafe_allow_html=True,
+            )
         else:
-            st.markdown('<div class="result-negative">[OK] Low Risk of Diabetes</div>',
-                       unsafe_allow_html=True)
+            st.markdown(
+                '<div class="result-negative">[OK] Low Risk of Diabetes</div>',
+                unsafe_allow_html=True,
+            )
 
         # Probability
         st.subheader("Probability")
         probability_percent = probability * 100
 
-        st.markdown(f"""
+        st.markdown(
+            f"""
         <div class="probability-bar"></div>
         **Risk Level: {probability_percent:.1f}%**
-        """, unsafe_allow_html=True)
+        """,
+            unsafe_allow_html=True,
+        )
 
         # Progress bar
         st.progress(probability)
@@ -362,27 +376,41 @@ def main():
 
         # Glucose-based recommendations
         if glucose > 140:
-            recommendations.append("[!] **Glucose level elevated** - Consider reducing sugar intake")
+            recommendations.append(
+                "[!] **Glucose level elevated** - Consider reducing sugar intake"
+            )
         elif glucose > 125:
-            recommendations.append("[!] **Glucose level above normal** - Monitor blood sugar regularly")
+            recommendations.append(
+                "[!] **Glucose level above normal** - Monitor blood sugar regularly"
+            )
 
         # BMI-based recommendations
         if bmi >= 30:
-            recommendations.append("[!] **BMI indicates obesity** - Weight management recommended")
+            recommendations.append(
+                "[!] **BMI indicates obesity** - Weight management recommended"
+            )
         elif bmi >= 25:
-            recommendations.append("[!] **BMI indicates overweight** - Consider healthy weight loss")
+            recommendations.append(
+                "[!] **BMI indicates overweight** - Consider healthy weight loss"
+            )
 
         # Blood pressure recommendations
         if blood_pressure > 90:
-            recommendations.append("[!] **Blood pressure elevated** - Regular monitoring advised")
+            recommendations.append(
+                "[!] **Blood pressure elevated** - Regular monitoring advised"
+            )
 
         # Age-based recommendations
         if age > 45:
-            recommendations.append("[!] **Age over 45** - Regular diabetes screening recommended")
+            recommendations.append(
+                "[!] **Age over 45** - Regular diabetes screening recommended"
+            )
 
         # General recommendations
         if len(recommendations) == 0:
-            recommendations.append("[OK] All parameters within normal range - Keep it up!")
+            recommendations.append(
+                "[OK] All parameters within normal range - Keep it up!"
+            )
 
         for rec in recommendations:
             st.markdown(f"- {rec}")
@@ -393,13 +421,16 @@ def main():
 
     # Footer
     st.markdown("---")
-    st.markdown("""
+    st.markdown(
+        """
     <div style='text-align: center; color: #666;'>
         <p><strong>Diabetes Prediction App</strong></p>
         <p>Built with ML Pipeline</p>
         <p>(c) 2026 - MLOps Project</p>
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
 
 if __name__ == "__main__":

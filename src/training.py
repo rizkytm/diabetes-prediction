@@ -10,37 +10,40 @@ Date: 2026-02-07
 """
 
 import os
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score,
-    f1_score, roc_auc_score, confusion_matrix,
-    classification_report
-)
+from typing import Dict, Tuple
+
+import joblib
 import mlflow
 import mlflow.sklearn
-import joblib
-from typing import Dict, Tuple, Optional, Union
-from pathlib import Path
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
+from sklearn.model_selection import train_test_split
 
 # Import preprocessing pipeline
 try:
-    from src.processing import create_preprocessing_pipeline, load_preprocessing_pipeline
+    from src.processing import create_preprocessing_pipeline
 except ImportError:
     # For running as standalone script
     import sys
+
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from src.processing import create_preprocessing_pipeline, load_preprocessing_pipeline
+    from src.processing import create_preprocessing_pipeline
 
 
 # ==================== MLFLOW SETUP ====================
 
+
 def setup_mlflow(
-    tracking_uri: str = 'MLruns',
-    experiment_name: str = 'Diabetes_Prediction'
+    tracking_uri: str = "MLruns", experiment_name: str = "Diabetes_Prediction"
 ) -> None:
     """
     Configure MLflow tracking.
@@ -60,7 +63,8 @@ def setup_mlflow(
 
 # ==================== DATA LOADING ====================
 
-def load_data(filepath: str = 'data/diabetes.csv') -> Tuple[pd.DataFrame, pd.Series]:
+
+def load_data(filepath: str = "data/diabetes.csv") -> Tuple[pd.DataFrame, pd.Series]:
     """
     Load diabetes dataset and separate features and target.
 
@@ -77,8 +81,8 @@ def load_data(filepath: str = 'data/diabetes.csv') -> Tuple[pd.DataFrame, pd.Ser
         Target variable
     """
     df = pd.read_csv(filepath)
-    X = df.drop('Outcome', axis=1)
-    y = df['Outcome']
+    X = df.drop("Outcome", axis=1)
+    y = df["Outcome"]
 
     print(f"[OK] Data loaded from: {filepath}")
     print(f"   Shape: {df.shape}")
@@ -93,7 +97,7 @@ def split_data(
     y: pd.Series,
     test_size: float = 0.2,
     random_state: int = 42,
-    stratify: bool = True
+    stratify: bool = True,
 ) -> Tuple:
     """
     Split data into train and test sets.
@@ -116,17 +120,14 @@ def split_data(
     X_train, X_test, y_train, y_test : Tuple of DataFrames/Series
         Split data
     """
-    split_params = {
-        'test_size': test_size,
-        'random_state': random_state
-    }
+    split_params = {"test_size": test_size, "random_state": random_state}
 
     if stratify:
-        split_params['stratify'] = y
+        split_params["stratify"] = y
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, **split_params)
 
-    print(f"[OK] Data split:")
+    print(f"[OK] Data split:")  # noqa: F541
     print(f"   Train: {len(X_train)} samples ({len(X_train)/len(X)*100:.1f}%)")
     print(f"   Test:  {len(X_test)} samples ({len(X_test)/len(X)*100:.1f}%)")
 
@@ -135,12 +136,13 @@ def split_data(
 
 # ==================== MODEL EVALUATION ====================
 
+
 def evaluate_model(
     model: object,
     X_train: np.ndarray,
     X_test: np.ndarray,
     y_train: pd.Series,
-    y_test: pd.Series
+    y_test: pd.Series,
 ) -> Dict[str, float]:
     """
     Evaluate model and return metrics.
@@ -177,16 +179,16 @@ def evaluate_model(
 
     # Calculate metrics
     metrics = {
-        'train_accuracy': accuracy_score(y_train, y_train_pred),
-        'test_accuracy': accuracy_score(y_test, y_test_pred),
-        'train_precision': precision_score(y_train, y_train_pred, zero_division=0),
-        'test_precision': precision_score(y_test, y_test_pred, zero_division=0),
-        'train_recall': recall_score(y_train, y_train_pred, zero_division=0),
-        'test_recall': recall_score(y_test, y_test_pred, zero_division=0),
-        'train_f1': f1_score(y_train, y_train_pred, zero_division=0),
-        'test_f1': f1_score(y_test, y_test_pred, zero_division=0),
-        'train_roc_auc': roc_auc_score(y_train, y_train_proba),
-        'test_roc_auc': roc_auc_score(y_test, y_test_proba)
+        "train_accuracy": accuracy_score(y_train, y_train_pred),
+        "test_accuracy": accuracy_score(y_test, y_test_pred),
+        "train_precision": precision_score(y_train, y_train_pred, zero_division=0),
+        "test_precision": precision_score(y_test, y_test_pred, zero_division=0),
+        "train_recall": recall_score(y_train, y_train_pred, zero_division=0),
+        "test_recall": recall_score(y_test, y_test_pred, zero_division=0),
+        "train_f1": f1_score(y_train, y_train_pred, zero_division=0),
+        "test_f1": f1_score(y_test, y_test_pred, zero_division=0),
+        "train_roc_auc": roc_auc_score(y_train, y_train_proba),
+        "test_roc_auc": roc_auc_score(y_test, y_test_proba),
     }
 
     return metrics
@@ -203,18 +205,18 @@ def print_metrics(metrics: Dict[str, float], model_name: str = "Model") -> None:
     model_name : str, default="Model"
         Name of the model
     """
-    print(f"\n{'='*70}")
+    print(f"\n{'='*70}")  # noqa: F541
     print(f"METRICS: {model_name}")
-    print(f"{'='*70}")
+    print(f"{'='*70}")  # noqa: F541  # noqa: F541
 
-    print(f"\nTRAINING METRICS:")
+    print(f"\nTRAINING METRICS:")  # noqa: F541
     print(f"   Accuracy:  {metrics['train_accuracy']:.4f}")
     print(f"   Precision: {metrics['train_precision']:.4f}")
     print(f"   Recall:    {metrics['train_recall']:.4f}")
     print(f"   F1-Score:  {metrics['train_f1']:.4f}")
     print(f"   ROC-AUC:   {metrics['train_roc_auc']:.4f}")
 
-    print(f"\nTEST METRICS:")
+    print(f"\nTEST METRICS:")  # noqa: F541
     print(f"   Accuracy:  {metrics['test_accuracy']:.4f}")
     print(f"   Precision: {metrics['test_precision']:.4f}")
     print(f"   Recall:    {metrics['test_recall']:.4f}  *** MOST IMPORTANT")
@@ -222,18 +224,19 @@ def print_metrics(metrics: Dict[str, float], model_name: str = "Model") -> None:
     print(f"   ROC-AUC:   {metrics['test_roc_auc']:.4f}")
 
     # Check for overfitting
-    acc_diff = metrics['train_accuracy'] - metrics['test_accuracy']
+    acc_diff = metrics["train_accuracy"] - metrics["test_accuracy"]
     if acc_diff > 0.1:
         print(f"\n[!] OVERFITTING: Gap = {acc_diff:.4f}")
     elif acc_diff < -0.05:
-        print(f"\n[!] UNDERFITTING: Test > Train")
+        print(f"\n[!] UNDERFITTING: Test > Train")  # noqa: F541
     else:
         print(f"\n[OK] GOOD FIT: Gap = {acc_diff:.4f}")
 
-    print(f"{'='*70}")
+    print(f"{'='*70}")  # noqa: F541
 
 
 # ==================== MODEL TRAINING ====================
+
 
 def train_logistic_regression(
     X_train: np.ndarray,
@@ -241,7 +244,7 @@ def train_logistic_regression(
     y_train: pd.Series,
     y_test: pd.Series,
     run_name: str = "Logistic_Regression",
-    **model_params
+    **model_params,
 ) -> Tuple[object, Dict[str, float]]:
     """
     Train Logistic Regression with MLflow tracking.
@@ -269,14 +272,14 @@ def train_logistic_regression(
         Evaluation metrics
     """
     print(f"\n[TRAINING] {run_name}")
-    print(f"{'='*70}")
+    print(f"{'='*70}")  # noqa: F541
 
     # Default parameters
     default_params = {
-        'class_weight': 'balanced',
-        'random_state': 42,
-        'solver': 'liblinear',
-        'max_iter': 1000
+        "class_weight": "balanced",
+        "random_state": 42,
+        "solver": "liblinear",
+        "max_iter": 1000,
     }
     params = {**default_params, **model_params}
 
@@ -315,7 +318,7 @@ def train_random_forest(
     y_train: pd.Series,
     y_test: pd.Series,
     run_name: str = "Random_Forest",
-    **model_params
+    **model_params,
 ) -> Tuple[object, Dict[str, float]]:
     """
     Train Random Forest with MLflow tracking.
@@ -343,16 +346,16 @@ def train_random_forest(
         Evaluation metrics
     """
     print(f"\n[TRAINING] {run_name}")
-    print(f"{'='*70}")
+    print(f"{'='*70}")  # noqa: F541
 
     # Default parameters
     default_params = {
-        'n_estimators': 100,
-        'class_weight': 'balanced',
-        'random_state': 42,
-        'max_depth': 10,
-        'min_samples_split': 5,
-        'n_jobs': -1
+        "n_estimators": 100,
+        "class_weight": "balanced",
+        "random_state": 42,
+        "max_depth": 10,
+        "min_samples_split": 5,
+        "n_jobs": -1,
     }
     params = {**default_params, **model_params}
 
@@ -380,14 +383,16 @@ def train_random_forest(
         print_metrics(metrics, run_name)
 
         # Feature importance
-        feature_importance = pd.DataFrame({
-            'feature': [f'feature_{i}' for i in range(model.n_features_in_)],
-            'importance': model.feature_importances_
-        }).sort_values('importance', ascending=False)
+        feature_importance = pd.DataFrame(
+            {
+                "feature": [f"feature_{i}" for i in range(model.n_features_in_)],
+                "importance": model.feature_importances_,
+            }
+        ).sort_values("importance", ascending=False)
 
-        print(f"\n[INFO] Top 5 Important Features:")
+        print(f"\n[INFO] Top 5 Important Features:")  # noqa: F541
         for idx, row in feature_importance.head(5).iterrows():
-            bar = '#' * int(row['importance'] * 50)
+            bar = "#" * int(row["importance"] * 50)
             print(f"   {row['feature']:<15} {row['importance']:.4f}  {bar}")
 
         run_id = mlflow.active_run().info.run_id
@@ -398,11 +403,8 @@ def train_random_forest(
 
 # ==================== SAVE & LOAD MODELS ====================
 
-def save_model(
-    model: object,
-    filepath: str,
-    model_name: str = "model"
-) -> None:
+
+def save_model(model: object, filepath: str, model_name: str = "model") -> None:
     """
     Save trained model to disk.
 
@@ -440,13 +442,14 @@ def load_model(filepath: str) -> object:
 
 # ==================== MAIN TRAINING PIPELINE ====================
 
+
 def run_training_pipeline(
-    data_path: str = 'data/diabetes.csv',
-    models_to_train: list = ['logistic_regression', 'random_forest'],
+    data_path: str = "data/diabetes.csv",
+    models_to_train: list = ["logistic_regression", "random_forest"],
     test_size: float = 0.2,
     random_state: int = 42,
     save_models: bool = True,
-    models_dir: str = 'models'
+    models_dir: str = "models",
 ) -> Dict[str, Tuple[object, Dict[str, float]]]:
     """
     Complete training pipeline: load data, preprocess, train models, evaluate.
@@ -471,9 +474,9 @@ def run_training_pipeline(
     results : dict
         Dictionary mapping model names to (model, metrics) tuples
     """
-    print("="*70)
+    print("=" * 70)
     print("DIABETES PREDICTION - TRAINING PIPELINE")
-    print("="*70)
+    print("=" * 70)
 
     # Setup MLflow
     setup_mlflow()
@@ -487,54 +490,53 @@ def run_training_pipeline(
     )
 
     # Create preprocessing pipeline
-    print(f"\n[INFO] Creating preprocessing pipeline...")
+    print(f"\n[INFO] Creating preprocessing pipeline...")  # noqa: F541
     preprocessing_pipeline = create_preprocessing_pipeline()
     preprocessing_pipeline.fit(X_train)
 
     # Save preprocessing pipeline
     if save_models:
         os.makedirs(models_dir, exist_ok=True)
-        prep_path = os.path.join(models_dir, 'preprocessing_pipeline.pkl')
+        prep_path = os.path.join(models_dir, "preprocessing_pipeline.pkl")
         save_model(preprocessing_pipeline, prep_path, "Preprocessing pipeline")
 
     # Apply preprocessing
     X_train_processed = preprocessing_pipeline.transform(X_train)
     X_test_processed = preprocessing_pipeline.transform(X_test)
 
-    print(f"\n[OK] Preprocessing complete:")
+    print(f"\n[OK] Preprocessing complete:")  # noqa: F541
     print(f"   Train shape: {X_train_processed.shape}")
     print(f"   Test shape:  {X_test_processed.shape}")
 
     # Train models
     results = {}
 
-    if 'logistic_regression' in models_to_train:
+    if "logistic_regression" in models_to_train:
         lr_model, lr_metrics = train_logistic_regression(
             X_train_processed, X_test_processed, y_train, y_test
         )
-        results['logistic_regression'] = (lr_model, lr_metrics)
+        results["logistic_regression"] = (lr_model, lr_metrics)
 
         if save_models:
-            lr_path = os.path.join(models_dir, 'logistic_regression_model.pkl')
+            lr_path = os.path.join(models_dir, "logistic_regression_model.pkl")
             save_model(lr_model, lr_path, "Logistic Regression")
 
-    if 'random_forest' in models_to_train:
+    if "random_forest" in models_to_train:
         rf_model, rf_metrics = train_random_forest(
             X_train_processed, X_test_processed, y_train, y_test
         )
-        results['random_forest'] = (rf_model, rf_metrics)
+        results["random_forest"] = (rf_model, rf_metrics)
 
         if save_models:
-            rf_path = os.path.join(models_dir, 'random_forest_model.pkl')
+            rf_path = os.path.join(models_dir, "random_forest_model.pkl")
             save_model(rf_model, rf_path, "Random Forest")
 
     # Select best model (based on recall)
     print(f"\n{'='*70}")
     print("MODEL SELECTION")
-    print(f"{'='*70}")
+    print(f"{'='*70}")  # noqa: F541
 
-    best_model_name = max(results.keys(),
-                         key=lambda k: results[k][1]['test_recall'])
+    best_model_name = max(results.keys(), key=lambda k: results[k][1]["test_recall"])
     best_model, best_metrics = results[best_model_name]
 
     print(f"\n[OK] Best Model: {best_model_name}")
@@ -544,16 +546,16 @@ def run_training_pipeline(
 
     # Save best model
     if save_models:
-        best_path = os.path.join(models_dir, 'best_model.pkl')
+        best_path = os.path.join(models_dir, "best_model.pkl")
         save_model(best_model, best_path, "Best Model")
 
     print(f"\n{'='*70}")
     print("TRAINING PIPELINE COMPLETE")
-    print(f"{'='*70}")
+    print(f"{'='*70}")  # noqa: F541
 
-    print(f"\n[INFO] View MLflow Dashboard:")
-    print(f"   mlflow ui")
-    print(f"   Open: http://localhost:5000")
+    print(f"\n[INFO] View MLflow Dashboard:")  # noqa: F541
+    print(f"   mlflow ui")  # noqa: F541
+    print(f"   Open: http://localhost:5000")  # noqa: F541
 
     return results
 
@@ -563,17 +565,24 @@ def run_training_pipeline(
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description='Train diabetes prediction models')
-    parser.add_argument('--data', type=str, default='data/diabetes.csv',
-                       help='Path to dataset')
-    parser.add_argument('--models', nargs='+',
-                       default=['logistic_regression', 'random_forest'],
-                       choices=['logistic_regression', 'random_forest'],
-                       help='Models to train')
-    parser.add_argument('--test-size', type=float, default=0.2,
-                       help='Test set proportion (default: 0.2)')
-    parser.add_argument('--no-save', action='store_true',
-                       help='Do not save models')
+    parser = argparse.ArgumentParser(description="Train diabetes prediction models")
+    parser.add_argument(
+        "--data", type=str, default="data/diabetes.csv", help="Path to dataset"
+    )
+    parser.add_argument(
+        "--models",
+        nargs="+",
+        default=["logistic_regression", "random_forest"],
+        choices=["logistic_regression", "random_forest"],
+        help="Models to train",
+    )
+    parser.add_argument(
+        "--test-size",
+        type=float,
+        default=0.2,
+        help="Test set proportion (default: 0.2)",
+    )
+    parser.add_argument("--no-save", action="store_true", help="Do not save models")
 
     args = parser.parse_args()
 
@@ -582,5 +591,5 @@ if __name__ == "__main__":
         data_path=args.data,
         models_to_train=args.models,
         test_size=args.test_size,
-        save_models=not args.no_save
+        save_models=not args.no_save,
     )

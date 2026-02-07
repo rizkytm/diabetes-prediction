@@ -9,9 +9,9 @@ Author: Claude Code
 Date: 2026-02-07
 """
 
+from typing import List, Optional
+
 from pydantic import BaseModel, Field, validator
-from typing import Optional, List
-import numpy as np
 
 
 class DiabetesInput(BaseModel):
@@ -22,11 +22,7 @@ class DiabetesInput(BaseModel):
     """
 
     pregnancies: int = Field(
-        ...,
-        ge=0,
-        le=20,
-        description="Number of times pregnant",
-        example=1
+        ..., ge=0, le=20, description="Number of times pregnant", example=1
     )
 
     glucose: float = Field(
@@ -34,31 +30,19 @@ class DiabetesInput(BaseModel):
         ge=0,
         le=300,
         description="Plasma glucose concentration after 2 hours in OGTT (mg/dL)",
-        example=120
+        example=120,
     )
 
     blood_pressure: float = Field(
-        ...,
-        ge=0,
-        le=200,
-        description="Diastolic blood pressure (mm Hg)",
-        example=70
+        ..., ge=0, le=200, description="Diastolic blood pressure (mm Hg)", example=70
     )
 
     skin_thickness: float = Field(
-        ...,
-        ge=0,
-        le=100,
-        description="Triceps skin fold thickness (mm)",
-        example=20
+        ..., ge=0, le=100, description="Triceps skin fold thickness (mm)", example=20
     )
 
     insulin: float = Field(
-        ...,
-        ge=0,
-        le=1000,
-        description="2-Hour serum insulin (mu U/ml)",
-        example=80
+        ..., ge=0, le=1000, description="2-Hour serum insulin (mu U/ml)", example=80
     )
 
     bmi: float = Field(
@@ -66,24 +50,14 @@ class DiabetesInput(BaseModel):
         ge=0.0,
         le=70.0,
         description="Body mass index (weight in kg / height in m^2)",
-        example=32.0
+        example=32.0,
     )
 
     diabetes_pedigree_function: float = Field(
-        ...,
-        ge=0.0,
-        le=3.0,
-        description="Diabetes genetic risk score",
-        example=0.5
+        ..., ge=0.0, le=3.0, description="Diabetes genetic risk score", example=0.5
     )
 
-    age: int = Field(
-        ...,
-        ge=21,
-        le=120,
-        description="Age in years",
-        example=33
-    )
+    age: int = Field(..., ge=21, le=120, description="Age in years", example=33)
 
     class Config:
         json_schema_extra = {
@@ -95,11 +69,11 @@ class DiabetesInput(BaseModel):
                 "insulin": 80,
                 "bmi": 32.0,
                 "diabetes_pedigree_function": 0.5,
-                "age": 33
+                "age": 33,
             }
         }
 
-    @validator('glucose')
+    @validator("glucose")
     def validate_glucose(cls, v):
         """Warn if glucose is unusually high or low."""
         if v > 0 and v < 50:
@@ -108,7 +82,7 @@ class DiabetesInput(BaseModel):
             raise ValueError("Glucose level too high (possible error)")
         return v
 
-    @validator('bmi')
+    @validator("bmi")
     def validate_bmi(cls, v):
         """Warn if BMI is outside reasonable range."""
         if v > 0 and v < 10:
@@ -124,37 +98,23 @@ class PredictionResponse(BaseModel):
     """
 
     prediction: int = Field(
-        ...,
-        ge=0,
-        le=1,
-        description="Predicted class (0=No Diabetes, 1=Diabetes)"
+        ..., ge=0, le=1, description="Predicted class (0=No Diabetes, 1=Diabetes)"
     )
 
     probability: float = Field(
-        ...,
-        ge=0.0,
-        le=1.0,
-        description="Probability of having diabetes"
+        ..., ge=0.0, le=1.0, description="Probability of having diabetes"
     )
 
     risk_level: str = Field(
-        ...,
-        description="Risk category: Low, Moderate, High, or Very High"
+        ..., description="Risk category: Low, Moderate, High, or Very High"
     )
 
-    confidence: str = Field(
-        ...,
-        description="Confidence level based on probability"
-    )
+    confidence: str = Field(..., description="Confidence level based on probability")
 
-    model_used: str = Field(
-        ...,
-        description="Name of the model used for prediction"
-    )
+    model_used: str = Field(..., description="Name of the model used for prediction")
 
     recommendations: List[str] = Field(
-        ...,
-        description="Health recommendations based on input parameters"
+        ..., description="Health recommendations based on input parameters"
     )
 
     class Config:
@@ -165,9 +125,7 @@ class PredictionResponse(BaseModel):
                 "risk_level": "Low Risk",
                 "confidence": "High",
                 "model_used": "LogisticRegression",
-                "recommendations": [
-                    "All parameters within normal range - Keep it up!"
-                ]
+                "recommendations": ["All parameters within normal range - Keep it up!"],
             }
         }
 
@@ -188,7 +146,7 @@ class HealthResponse(BaseModel):
                 "status": "healthy",
                 "model_loaded": True,
                 "api_version": "1.0.0",
-                "mlflow_tracking": False
+                "mlflow_tracking": False,
             }
         }
 
@@ -219,10 +177,10 @@ class ModelInfoResponse(BaseModel):
                     "Insulin",
                     "BMI",
                     "DiabetesPedigreeFunction",
-                    "Age"
+                    "Age",
                 ],
                 "target_metric": "Recall",
-                "training_date": "2026-02-07"
+                "training_date": "2026-02-07",
             }
         }
 
@@ -236,7 +194,7 @@ class BatchPredictionInput(BaseModel):
         ...,
         min_items=1,
         max_items=100,
-        description="List of patient data for batch prediction"
+        description="List of patient data for batch prediction",
     )
 
     class Config:
@@ -251,7 +209,7 @@ class BatchPredictionInput(BaseModel):
                         "insulin": 80,
                         "bmi": 32.0,
                         "diabetes_pedigree_function": 0.5,
-                        "age": 33
+                        "age": 33,
                     },
                     {
                         "pregnancies": 0,
@@ -261,8 +219,8 @@ class BatchPredictionInput(BaseModel):
                         "insulin": 100,
                         "bmi": 35.0,
                         "diabetes_pedigree_function": 0.6,
-                        "age": 45
-                    }
+                        "age": 45,
+                    },
                 ]
             }
         }
@@ -274,14 +232,10 @@ class BatchPredictionResponse(BaseModel):
     """
 
     predictions: List[PredictionResponse] = Field(
-        ...,
-        description="List of predictions for each patient"
+        ..., description="List of predictions for each patient"
     )
 
-    summary: dict = Field(
-        ...,
-        description="Summary statistics of batch predictions"
-    )
+    summary: dict = Field(..., description="Summary statistics of batch predictions")
 
     class Config:
         json_schema_extra = {
@@ -290,7 +244,7 @@ class BatchPredictionResponse(BaseModel):
                 "summary": {
                     "total_patients": 2,
                     "high_risk_count": 1,
-                    "average_probability": 0.45
-                }
+                    "average_probability": 0.45,
+                },
             }
         }

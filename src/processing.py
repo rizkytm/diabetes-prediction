@@ -8,14 +8,14 @@ Author: Claude Code
 Date: 2026-02-07
 """
 
+from typing import List, Optional, Union
+
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler
-from typing import List, Optional, Union
-import joblib
+from sklearn.pipeline import Pipeline
 
 
 class ZeroToNanTransformer(BaseEstimator, TransformerMixin):
@@ -64,13 +64,21 @@ class ZeroToNanTransformer(BaseEstimator, TransformerMixin):
             If None, uses default medical columns.
         """
         if medical_columns is None:
-            self.medical_columns = ['Glucose', 'BloodPressure',
-                                   'SkinThickness', 'Insulin', 'BMI']
+            self.medical_columns = [
+                "Glucose",
+                "BloodPressure",
+                "SkinThickness",
+                "Insulin",
+                "BMI",
+            ]
         else:
             self.medical_columns = medical_columns
 
-    def fit(self, X: Union[pd.DataFrame, np.ndarray],
-            y: Optional[Union[pd.DataFrame, np.ndarray]] = None):
+    def fit(
+        self,
+        X: Union[pd.DataFrame, np.ndarray],
+        y: Optional[Union[pd.DataFrame, np.ndarray]] = None,
+    ):
         """
         Fit method (required for sklearn pipeline compatibility).
 
@@ -115,15 +123,12 @@ class ZeroToNanTransformer(BaseEstimator, TransformerMixin):
 
         # Convert to DataFrame if numpy array
         if not isinstance(X_transformed, pd.DataFrame):
-            if not hasattr(self, 'feature_names_in_'):
+            if not hasattr(self, "feature_names_in_"):
                 raise ValueError(
                     "Cannot transform numpy array without feature names. "
                     "Either provide a DataFrame or fit on a DataFrame first."
                 )
-            X_transformed = pd.DataFrame(
-                X_transformed,
-                columns=self.feature_names_in_
-            )
+            X_transformed = pd.DataFrame(X_transformed, columns=self.feature_names_in_)
 
         # Validate that medical columns exist
         missing_cols = set(self.medical_columns) - set(X_transformed.columns)
@@ -143,9 +148,11 @@ class ZeroToNanTransformer(BaseEstimator, TransformerMixin):
 
         return X_transformed
 
-    def fit_transform(self, X: Union[pd.DataFrame, np.ndarray],
-                     y: Optional[Union[pd.DataFrame, np.ndarray]] = None
-                     ) -> pd.DataFrame:
+    def fit_transform(
+        self,
+        X: Union[pd.DataFrame, np.ndarray],
+        y: Optional[Union[pd.DataFrame, np.ndarray]] = None,
+    ) -> pd.DataFrame:
         """
         Fit and transform in one step.
 
@@ -165,8 +172,7 @@ class ZeroToNanTransformer(BaseEstimator, TransformerMixin):
 
 
 def create_preprocessing_pipeline(
-    imputer_strategy: str = 'median',
-    scaler: str = 'standard'
+    imputer_strategy: str = "median", scaler: str = "standard"
 ) -> Pipeline:
     """
     Create a complete preprocessing pipeline for diabetes prediction.
@@ -205,7 +211,7 @@ def create_preprocessing_pipeline(
     >>> # Pipeline is ready for training or inference
     """
     # Validate imputer strategy
-    valid_strategies = ['mean', 'median', 'most_frequent', 'constant']
+    valid_strategies = ["mean", "median", "most_frequent", "constant"]
     if imputer_strategy not in valid_strategies:
         raise ValueError(
             f"Invalid imputer_strategy: {imputer_strategy}. "
@@ -214,20 +220,23 @@ def create_preprocessing_pipeline(
 
     # Build pipeline steps
     pipeline_steps = [
-        ('zero_to_nan', ZeroToNanTransformer()),
-        ('imputer', SimpleImputer(strategy=imputer_strategy))
+        ("zero_to_nan", ZeroToNanTransformer()),
+        ("imputer", SimpleImputer(strategy=imputer_strategy)),
     ]
 
     # Add scaler if specified
-    if scaler == 'standard':
+    if scaler == "standard":
         from sklearn.preprocessing import StandardScaler
-        pipeline_steps.append(('scaler', StandardScaler()))
-    elif scaler == 'minmax':
+
+        pipeline_steps.append(("scaler", StandardScaler()))
+    elif scaler == "minmax":
         from sklearn.preprocessing import MinMaxScaler
-        pipeline_steps.append(('scaler', MinMaxScaler()))
-    elif scaler == 'robust':
+
+        pipeline_steps.append(("scaler", MinMaxScaler()))
+    elif scaler == "robust":
         from sklearn.preprocessing import RobustScaler
-        pipeline_steps.append(('scaler', RobustScaler()))
+
+        pipeline_steps.append(("scaler", RobustScaler()))
     elif scaler is not None:
         raise ValueError(
             f"Invalid scaler: {scaler}. Must be 'standard', 'minmax', 'robust', or None"
@@ -240,8 +249,7 @@ def create_preprocessing_pipeline(
 
 
 def save_preprocessing_pipeline(
-    pipeline: Pipeline,
-    filepath: str = 'models/preprocessing_pipeline.pkl'
+    pipeline: Pipeline, filepath: str = "models/preprocessing_pipeline.pkl"
 ) -> None:
     """
     Save preprocessing pipeline to disk.
@@ -265,7 +273,7 @@ def save_preprocessing_pipeline(
 
 
 def load_preprocessing_pipeline(
-    filepath: str = 'models/preprocessing_pipeline.pkl'
+    filepath: str = "models/preprocessing_pipeline.pkl",
 ) -> Pipeline:
     """
     Load preprocessing pipeline from disk.

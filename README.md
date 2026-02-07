@@ -266,9 +266,32 @@ Untuk melihat rencana pengembangan ke depan dan prioritas yang belum diimplement
 
 ---
 
+## 🎨 Code Quality & Auto-Formatting
+
+Untuk mencegah CI/CD failure karena formatting, baca panduan:
+
+**[📝 CODE_QUALITY.md](CODE_QUALITY.md)** - Berisi:
+- Cara auto-format code dengan Black & isort
+- Setup pre-commit hooks (automatic formatting sebelum commit)
+- Command references dan troubleshooting
+- Best practices untuk code quality
+
+**Quick Fix:**
+```bash
+make format  # Format all code
+```
+
+---
+
 ## 🤝 Kontribusi
 
 Jika Anda ingin mengembangkan proyek ini lebih lanjut, silakan ajukan *pull request* atau pilih item dari [ROADMAP.md](ROADMAP.md) untuk diimplementasikan.
+
+**Sebelum commit/push:**
+```bash
+make format  # Format code
+make lint    # Check code quality
+```
 
 ---
 
