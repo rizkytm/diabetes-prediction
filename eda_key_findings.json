@@ -1,0 +1,42 @@
+{
+  "dataset_shape": [
+    768,
+    9
+  ],
+  "total_samples": 768,
+  "total_features": 8,
+  "class_distribution": {
+    "no_diabetes": 500,
+    "diabetes": 268
+  },
+  "class_percentages": {
+    "no_diabetes": 65.10416666666666,
+    "diabetes": 34.89583333333333
+  },
+  "class_ratio": "500/268 = 1.87:1",
+  "invalid_zeros": {
+    "Glucose": 5,
+    "BloodPressure": 35,
+    "SkinThickness": 227,
+    "Insulin": 374,
+    "BMI": 11
+  },
+  "total_invalid_zeros": 652,
+  "top_correlated_features": {
+    "Glucose": 0.46658139830687373,
+    "BMI": 0.29269466264444544,
+    "Age": 0.23835598302719754,
+    "Pregnancies": 0.22189815303398636
+  },
+  "target_metrics": {
+    "recall": 0.7,
+    "f1_score": 0.65,
+    "roc_auc": 0.75
+  },
+  "next_steps": [
+    "Create ZeroToNanTransformer in src/processing.py",
+    "Build preprocessing pipeline with imputation and scaling",
+    "Implement training script with MLflow tracking",
+    "Build Streamlit app for predictions"
+  ]
+}

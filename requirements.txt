@@ -1,0 +1,24 @@
+# Core Data Science Libraries
+pandas==2.2.3
+numpy==1.26.4
+
+# Machine Learning
+scikit-learn==1.5.2
+
+# MLOps - Experiment Tracking
+mlflow==2.18.0
+
+# Web Application
+streamlit==1.40.1
+
+# Visualization (for EDA)
+matplotlib==3.9.2
+seaborn==0.13.2
+
+# Jupyter Notebook
+jupyter==1.1.1
+notebook==7.3.1
+ipykernel==6.29.5
+
+# Model Persistence
+joblib==1.4.2

@@ -1,0 +1,132 @@
+# ==================== Python ====================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
+
+# ==================== Virtual Environment ====================
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+virtualenv/
+
+# ==================== Jupyter Notebook ====================
+# IPython
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ==================== IDEs ====================
+# VS Code
+.vscode/
+
+# PyCharm / IntelliJ
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ==================== MLflow ====================
+# MLflow experiment tracking data
+MLruns/
+mlruns/
+
+# ==================== Model Artifacts ====================
+# Uncomment if you want to ignore trained models
+# (Recommended for production with large models or many versions)
+# models/*.pkl
+
+# For this project, we're keeping models in git for reproducibility
+# Comment the above line if you want to track models
+
+# ==================== Data ====================
+# Uncomment to ignore raw data files
+# (Recommended for large datasets or sensitive data)
+# data/*.csv
+# data/raw/
+
+# For this project, we're keeping diabetes.csv in git (small, public dataset)
+# Uncomment if you want to ignore data files
+
+# ==================== Environment & Secrets ====================
+# Environment variables with secrets
+.env
+.env.*
+*.env
+secrets/
+
+# ==================== Logs ====================
+# Log files
+*.log
+logs/
+*.log.*
+
+# ==================== Temporary Files ====================
+# OS generated files
+Thumbs.db
+.DS_Store?
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# ==================== MyPy & Type Checkers ====================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ==================== Other ====================
+# profiling data
+.prof
+
+# database
+*.db
+*.sqlite

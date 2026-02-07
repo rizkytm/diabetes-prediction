@@ -1,0 +1,17 @@
+{
+  "pipeline_components": [
+    "ZeroToNanTransformer",
+    "SimpleImputer(median)",
+    "StandardScaler"
+  ],
+  "features_processed": 8,
+  "samples_processed": 768,
+  "verification": {
+    "no_missing_values": true,
+    "features_normalized": true,
+    "no_invalid_values": true
+  },
+  "pipeline_saved": true,
+  "pipeline_path": "../models/preprocessing_pipeline.pkl",
+  "ready_for_training": true
+}
