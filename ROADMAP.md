@@ -1512,6 +1512,553 @@ git push origin feature/[priority-name]
 
 ---
 
+## 🌐 Production Deployment
+
+**Goal:** Deploy application to cloud platform for public access
+
+**Current State:** Running locally with Docker Compose on ports 8501 (Streamlit), 8000 (API), 5001 (MLflow)
+
+---
+
+### Deployment Options Comparison
+
+| Platform | Cost | Difficulty | Scaling | Best For |
+|----------|------|------------|---------|----------|
+| **Render** | Free tier available | ⭐ Easy | Limited | Small projects, MVP |
+| **Railway** | $5-20/month | ⭐ Easy | Good | Development, small apps |
+| **Google Cloud Run** | Pay-per-use | ⭐⭐ Medium | Auto-scaling | Serverless, variable traffic |
+| **AWS ECS** | Free tier + pay | ⭐⭐⭐ Hard | Excellent | Production, enterprise |
+| **Azure Container Instances** | Pay-per-use | ⭐⭐ Medium | Good | Azure ecosystem |
+| **Heroku** | $5-7/month | ⭐ Easy | Limited | Quick deployment |
+
+---
+
+### Option 1: Render (Recommended for Start) ⭐
+
+**Why Render:**
+- ✅ Free tier available
+- ✅ Easy Docker deployment
+- ✅ Automatic SSL
+- ✅ Simple dashboard
+- ✅ Good for small projects
+
+**Deployment Steps:**
+
+#### 1. Prepare Environment Variables
+
+Create `.env.production`:
+
+```bash
+# Model paths
+MODEL_PATH=/app/models/best_model.pkl
+PIPELINE_PATH=/app/models/preprocessing_pipeline.pkl
+
+# MLflow
+MLFLOW_TRACKING_URI=http://localhost:5001
+
+# API Configuration
+API_HOST=0.0.0.0
+API_PORT=8000
+
+# Streamlit
+STREAMLIT_SERVER_PORT=8501
+STREAMLIT_SERVER_ADDRESS=0.0.0.0
+```
+
+#### 2. Deploy Streamlit App
+
+```bash
+# 1. Create Render account at https://render.com/
+# 2. Click "New +" → "Web Service"
+# 3. Connect GitHub repository
+# 4. Configure:
+#    - Name: diabetes-streamlit
+#    - Environment: Docker
+#    - Build Command: (leave empty for Docker)
+#    - Start Command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+#    - Docker Context: /
+#    - Dockerfile Path: Dockerfile
+
+# 5. Add Environment Variables (from .env.production above)
+# 6. Deploy!
+```
+
+**Render Dashboard Configuration:**
+
+```yaml
+# render.yaml (create this file in project root)
+services:
+  - type: web
+    name: diabetes-streamlit
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free  # or starter, standard, pro
+    envVars:
+      - key: MODEL_PATH
+        value: /app/models/best_model.pkl
+      - key: PIPELINE_PATH
+        value: /app/models/preprocessing_pipeline.pkl
+      - key: STREAMLIT_SERVER_PORT
+        value: 8501
+```
+
+#### 3. Deploy FastAPI Backend
+
+```bash
+# 1. Create another "Web Service" in Render
+# 2. Configure:
+#    - Name: diabetes-api
+#    - Environment: Docker
+#    - Dockerfile Path: Dockerfile.api
+#    - Start Command: uvicorn api:app --host 0.0.0.0 --port 8000
+
+# 3. Add Environment Variables
+# 4. Deploy!
+```
+
+**API Render Service:**
+
+```yaml
+# Add to render.yaml
+  - type: web
+    name: diabetes-api
+    env: docker
+    dockerfilePath: ./Dockerfile.api
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: MODEL_PATH
+        value: /app/models/best_model.pkl
+      - key: PIPELINE_PATH
+        value: /app/models/preprocessing_pipeline.pkl
+      - key: API_PORT
+        value: 8000
+```
+
+#### 4. Deploy MLflow (Optional)
+
+```bash
+# For MLflow, use a background worker or separate service
+# MLflow is for development, so optional for production
+```
+
+#### 5. Update API URLs in Streamlit
+
+Modify `app.py`:
+
+```python
+# Production API URL (Render provides this)
+API_URL = os.getenv(
+    "API_URL",
+    "https://diabetes-api.onrender.com"  # Replace with actual URL
+)
+
+# Use in prediction function
+response = requests.post(f"{API_URL}/predict", json=input_data)
+```
+
+#### 6. Custom Domain (Optional)
+
+```bash
+# 1. Go to Render dashboard → Your Service → Settings
+# 2. Add Custom Domain
+# 3. Update DNS at your domain registrar:
+#    Type: CNAME
+#    Name: api
+#    Value: [your-service].onrender.com
+
+# 4. Render will automatically provision SSL certificate
+```
+
+**Expected URLs:**
+- Streamlit: `https://diabetes-streamlit.onrender.com`
+- API: `https://diabetes-api.onrender.com`
+- Custom: `https://diabetes.yourdomain.com`
+
+---
+
+### Option 2: Railway (Alternative to Render)
+
+**Why Railway:**
+- ✅ Simple interface
+- ✅ Good Docker support
+- ✅ Built-in databases
+- ✅ Reasonable pricing
+- ✅ Auto-deploys from GitHub
+
+**Deployment Steps:**
+
+```bash
+# 1. Create account at https://railway.app/
+# 2. Install CLI: npm install -g railway
+# 3. Login: railway login
+# 4. Initialize project: railway init
+# 5. Link GitHub repository
+
+# 6. Deploy Streamlit
+railway add --service diabetes-streamlit
+railway up
+
+# 7. Deploy API
+railway add --service diabetes-api
+railway up
+
+# 8. Set environment variables
+railway variables set MODEL_PATH=/app/models/best_model.pkl
+railway variables set PIPELINE_PATH=/app/models/preprocessing_pipeline.pkl
+
+# 9. Get URLs
+railway domain
+```
+
+**Railway Configuration:**
+
+```toml
+# railway.toml
+[project]
+name = "diabetes-prediction"
+
+[[services]]
+name = "diabetes-streamlit"
+dockerfilePath = "Dockerfile"
+[[services.ports]]
+port = 8501
+type = "HTTP"
+
+[[services]]
+name = "diabetes-api"
+dockerfilePath = "Dockerfile.api"
+[[services.ports]]
+port = 8000
+type = "HTTP"
+```
+
+---
+
+### Option 3: Google Cloud Run (Production-Grade)
+
+**Why Cloud Run:**
+- ✅ Serverless (pay-per-use)
+- ✅ Auto-scaling
+- ✅ Automatic SSL
+- ✅ Good for variable traffic
+- ✅ Managed by Google
+
+**Deployment Steps:**
+
+#### 1. Install Google Cloud SDK
+
+```bash
+# macOS
+brew install google-cloud-sdk
+
+# Initialize
+gcloud init
+```
+
+#### 2. Build and Push Images
+
+```bash
+# Enable APIs
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable run.googleapis.com
+
+# Set project
+export PROJECT_ID="your-project-id"
+gcloud config set project $PROJECT_ID
+
+# Build Streamlit image
+gcloud builds submit --tag gcr.io/$PROJECT_ID/diabetes-streamlit .
+
+# Build API image
+gcloud builds submit --tag gcr.io/$PROJECT_ID/diabetes-api --file Dockerfile.api .
+```
+
+#### 3. Deploy to Cloud Run
+
+```bash
+# Deploy Streamlit
+gcloud run deploy diabetes-streamlit \
+  --image gcr.io/$PROJECT_ID/diabetes-streamlit \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8501 \
+  --set-env-vars MODEL_PATH=/app/models/best_model.pkl,PIPELINE_PATH=/app/models/preprocessing_pipeline.pkl
+
+# Deploy API
+gcloud run deploy diabetes-api \
+  --image gcr.io/$PROJECT_ID/diabetes-api \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8000 \
+  --set-env-vars MODEL_PATH=/app/models/best_model.pkl,PIPELINE_PATH=/app/models/preprocessing_pipeline.pkl
+```
+
+#### 4. Get Service URLs
+
+```bash
+# Get URLs
+gcloud run services describe diabetes-streamlit --region us-central1 --format 'value(status.url)'
+gcloud run services describe diabetes-api --region us-central1 --format 'value(status.url)'
+```
+
+#### 5. Setup Custom Domain
+
+```bash
+# 1. Verify domain ownership
+gcloud domains verify yourdomain.com
+
+# 2. Create domain mapping
+gcloud run domain-mappings create \
+  --service=diabetes-streamlit \
+  --domain=diabetes.yourdomain.com
+
+# 3. Update DNS records (Google will provide instructions)
+# 4. SSL is automatically provisioned
+```
+
+**Expected Costs:**
+- Free tier: 2 million requests/month
+- Beyond free: ~$0.40 per 1 million requests
+- Compute: Pay-per-use (often $0-20/month for small apps)
+
+---
+
+### Option 4: AWS ECS (Enterprise)
+
+**Why AWS ECS:**
+- ✅ Enterprise-grade
+- ✅ Highly scalable
+- ✅ Integrates with AWS ecosystem
+- ✅ Load balancing
+- ❌ More complex setup
+
+**Deployment Steps:**
+
+```bash
+# 1. Create AWS account
+# 2. Install AWS CLI: brew install awscli
+# 3. Configure: aws configure
+
+# 4. Create ECR repository
+aws ecr create-repository --repository-name diabetes-streamlit
+aws ecr create-repository --repository-name diabetes-api
+
+# 5. Login to ECR
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+
+# 6. Build and push
+docker build -t diabetes-streamlit -f Dockerfile .
+docker tag diabetes-streamlit:latest YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/diabetes-streamlit:latest
+docker push YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/diabetes-streamlit:latest
+
+# 7. Create ECS cluster, task definitions, services (via AWS Console or Terraform)
+```
+
+---
+
+### Pre-Deployment Checklist ✅
+
+#### Security:
+- [ ] Change default passwords
+- [ ] Use environment variables for secrets
+- [ ] Enable HTTPS/SSL
+- [ ] Set up authentication (if needed)
+- [ ] Configure CORS for API
+- [ ] Add rate limiting
+- [ ] Enable request logging
+
+#### Performance:
+- [ ] Optimize Docker image sizes
+- [ ] Enable caching
+- [ ] Configure auto-scaling
+- [ ] Set up CDN (optional)
+- [ ] Monitor resource usage
+
+#### Monitoring:
+- [ ] Enable health checks
+- [ ] Set up error tracking (Sentry)
+- [ ] Configure uptime monitoring
+- [ ] Add analytics (optional)
+- [ ] Set up alerts
+
+#### Documentation:
+- [ ] Update API URLs in README
+- [ ] Document deployment process
+- [ ] Create runbook for common issues
+- [ ] Document rollback procedure
+
+---
+
+### Post-Deployment Tasks
+
+#### 1. Update CI/CD Pipeline
+
+Add deployment step to `.github/workflows/ml-pipeline.yml`:
+
+```yaml
+# Add to build job after Docker push
+- name: Deploy to Render
+  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  run: |
+    # Trigger Render deployment (automatic on push)
+    echo "Deploying to Render..."
+    # Or use Render API to trigger deployment
+    curl -X POST $RENDER_DEPLOY_WEBHOOK
+
+# Or for Railway:
+- name: Deploy to Railway
+  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  run: |
+    railway up
+```
+
+#### 2. Set Up Monitoring
+
+```python
+# Add to api.py
+from prometheus_client import Counter, Histogram, generate_latest
+
+REQUEST_COUNT = Counter('http_requests_total', 'Total requests')
+REQUEST_LATENCY = Histogram('http_request_duration_seconds', 'Request latency')
+
+@app.get("/metrics")
+async def metrics():
+    return Response(generate_latest(), media_type="text/plain")
+```
+
+#### 3. Configure Domain
+
+```bash
+# Update DNS records
+Type: CNAME
+Name: api
+Value: [your-service].onrender.com
+
+Type: CNAME
+Name: app
+Value: [your-service].onrender.com
+
+# SSL will be auto-provisioned by most platforms
+```
+
+#### 4. Test Deployment
+
+```bash
+# Test API
+curl https://diabetes-api.onrender.com/health
+
+# Test prediction
+curl -X POST https://diabetes-api.onrender.com/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pregnancies": 1,
+    "glucose": 120,
+    "blood_pressure": 70,
+    "skin_thickness": 20,
+    "insulin": 80,
+    "bmi": 32.0,
+    "diabetes_pedigree_function": 0.5,
+    "age": 33
+  }'
+
+# Test Streamlit
+# Open https://diabetes-streamlit.onrender.com in browser
+```
+
+---
+
+### Cost Comparison (Monthly)
+
+| Platform | Free Tier | Paid | Est. Monthly Cost |
+|----------|-----------|------|------------------|
+| **Render** | 750 hours/month | $7/start | $0-25 |
+| **Railway** | $5 credit | $5-20/month | $5-30 |
+| **Cloud Run** | 2M requests | Pay-per-use | $0-50 |
+| **AWS ECS** | 750 hours/month | Varies | $20-100+ |
+| **Heroku** | None | $5-7+/month | $5-50+ |
+
+---
+
+### Troubleshooting
+
+#### Issue: Container Crashes
+
+```bash
+# Check logs
+render logs diabetes-streamlit  # Render
+railway logs  # Railway
+gcloud logging read  # Cloud Run
+
+# Common fixes:
+# - Increase memory limits
+# - Check environment variables
+# - Verify file paths
+# - Add health checks
+```
+
+#### Issue: Slow Performance
+
+```bash
+# Solutions:
+# - Upgrade to paid tier (more resources)
+# - Optimize Docker image
+# - Enable caching
+# - Use CDN for static assets
+# - Add load balancing
+```
+
+#### Issue: High Costs
+
+```bash
+# Solutions:
+# - Set budget alerts
+# - Optimize cold starts
+# - Use smaller instances
+# - Enable compression
+# - Monitor usage regularly
+```
+
+---
+
+### Expected Timeline
+
+| Phase | Duration | Tasks |
+|-------|----------|-------|
+| **Preparation** | 1 day | Set up accounts, prepare configs |
+| **Deployment** | 1 day | Deploy Streamlit + API |
+| **Configuration** | 0.5 day | Domain, SSL, environment variables |
+| **Testing** | 0.5 day | Test all endpoints, monitoring |
+| **Documentation** | 0.5 day | Update README, docs |
+
+**Total: 2-3 days**
+
+---
+
+### Recommended Path
+
+```mermaid
+graph LR
+    A[Local Dev] --> B[Choose Platform]
+    B --> C{Traffic Level?}
+    C -->|Low| D[Render Free]
+    C -->|Medium| E[Railway/Cloud Run]
+    C -->|High| F[AWS ECS]
+    D --> G[Custom Domain]
+    E --> G
+    F --> G
+    G --> H[Monitor & Scale]
+```
+
+**Start with:** Render (free tier)
+**Scale to:** Cloud Run when needed
+**Enterprise:** AWS ECS when required
+
+---
+
 ## 🎛️ Priority 5: Workflow Orchestration
 
 **Goal:** Automate ML workflows and pipelines at scale
