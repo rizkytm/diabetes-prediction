@@ -125,7 +125,8 @@ Raw Data (`data/diabetes.csv`) → Processing Pipeline (`src/processing.py`) →
 - ✅ `requirements.txt` - All dependencies specified with M1-compatible versions
 - ✅ `src/processing.py` - Custom ZeroToNanTransformer and preprocessing pipeline
 - ✅ `src/training.py` - Model training with MLflow tracking (Logistic Regression & Random Forest)
-- ✅ `src/__init__.py` - Package exports for clean imports
+- ✅ `src/__init__.py` - Package exports
+- ✅ `src/schemas.py` - API request/response schemas with Pydantic validation
 - ✅ `app.py` - Streamlit web application with probability visualization
 
 **Notebooks (Exploration & Development):**
@@ -139,12 +140,57 @@ Raw Data (`data/diabetes.csv`) → Processing Pipeline (`src/processing.py`) →
 - ✅ `random_forest_model.pkl` - Trained Random Forest model
 - ✅ `best_model.pkl` - Best model selected by test recall metric
 
+**API & Deployment:**
+- ✅ `api.py` - FastAPI REST API with 5 endpoints
+- ✅ `Dockerfile` - Streamlit container image
+- ✅ `Dockerfile.api` - FastAPI container image
+- ✅ `Dockerfile.mlflow` - MLflow container image
+- ✅ `docker-compose.yml` - Multi-service orchestration (ports: 8501, 8000, 5001)
+
+**CI/CD & Automation:**
+- ✅ `.github/workflows/ml-pipeline.yml` - GitHub Actions workflow
+- ✅ `Makefile` - Utility commands for development
+- ✅ `start.sh` - Interactive quick start script
+
 **Documentation:**
 - ✅ `README.md` - Complete project documentation
 - ✅ `CLAUDE.md` - This file (guidance for Claude Code)
+- ✅ `DEPLOYMENT.md` - Comprehensive deployment guide
+- ✅ `MLFLOW_DOCKER.md` - MLflow troubleshooting guide
+- ✅ `ROADMAP.md` - Future improvements and priorities
 
 **READY FOR:**
 - Model deployment (Streamlit app already working)
 - Containerization (Docker)
 - CI/CD pipeline integration
-- API deployment (FastAPI/Flask wrapper)
+- API deployment (FastAPI)
+
+---
+
+## 🗺️ Future Priorities
+
+For detailed roadmap of unimplemented features, see **[ROADMAP.md](ROADMAP.md)**.
+
+**Quick Overview:**
+
+**Priority 1: Model Improvements** (1-2 weeks)
+- Hyperparameter Tuning with GridSearch/RandomizedSearch
+- SMOTE for advanced class imbalance handling
+- Model Ensemble (Voting, Stacking, Bagging)
+- Additional Algorithms (XGBoost, LightGBM, SVM)
+
+**Priority 3: Monitoring & Maintenance** (1 week)
+- Model Monitoring (data drift detection, performance tracking)
+- Enhanced Logging System (audit trail, prediction history)
+
+**Priority 4: Testing** (1 week)
+- Unit Tests (pytest, >80% coverage)
+- Integration Tests (end-to-end workflows)
+
+**Priority 5: Advanced Features** (1-2 weeks)
+- Feature Engineering (domain-specific features)
+- Model Explainability (SHAP for interpretability)
+- A/B Testing Framework (model comparison)
+
+---
+

@@ -254,9 +254,21 @@ Lihat detail di `.github/workflows/ml-pipeline.yml`
 
 ---
 
+## 🗺️ Roadmap
+
+Untuk melihat rencana pengembangan ke depan dan prioritas yang belum diimplementasikan, lihat:
+
+**[📋 ROADMAP.md](ROADMAP.md)** - Berisi:
+- Priority 1: Model Improvements (Hyperparameter Tuning, SMOTE, Ensemble, XGBoost)
+- Priority 3: Monitoring & Maintenance (Model Monitoring, Logging System)
+- Priority 4: Testing (Unit Tests, Integration Tests)
+- Priority 5: Advanced Features (Feature Engineering, Explainability, A/B Testing)
+
+---
+
 ## 🤝 Kontribusi
 
-Jika Anda ingin mengembangkan proyek ini lebih lanjut, silakan ajukan *pull request*.
+Jika Anda ingin mengembangkan proyek ini lebih lanjut, silakan ajukan *pull request* atau pilih item dari [ROADMAP.md](ROADMAP.md) untuk diimplementasikan.
 
 ---
 
