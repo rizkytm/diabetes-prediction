@@ -4,6 +4,7 @@ Diabetes Prediction MLOps Package
 This package contains modules for diabetes prediction including:
 - processing.py: Data preprocessing pipeline
 - training.py: Model training with MLflow tracking
+- schemas.py: API request/response schemas for FastAPI
 """
 
 __version__ = "1.0.0"
@@ -37,3 +38,22 @@ __all__ = [
     'train_random_forest',
     'run_training_pipeline'
 ]
+
+# Export schemas for API usage
+from src.schemas import (
+    DiabetesInput,
+    PredictionResponse,
+    HealthResponse,
+    ModelInfoResponse,
+    BatchPredictionInput,
+    BatchPredictionResponse
+)
+
+__all__.extend([
+    'DiabetesInput',
+    'PredictionResponse',
+    'HealthResponse',
+    'ModelInfoResponse',
+    'BatchPredictionInput',
+    'BatchPredictionResponse'
+])

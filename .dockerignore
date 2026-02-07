@@ -1,0 +1,71 @@
+# ==================== Git ====================
+.git
+.gitignore
+.github
+
+# ==================== Python ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# ==================== Virtual Environment ====================
+venv/
+env/
+ENV/
+.venv/
+virtualenv/
+
+# ==================== IDEs ====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ==================== Jupyter Notebook ====================
+.ipynb_checkpoints/
+
+# ==================== MLflow ====================
+MLruns/
+mlruns/
+
+# ==================== Documentation ====================
+README.md
+CLAUDE.md
+*.md
+docs/
+
+# ==================== Tests ====================
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ==================== Logs ====================
+*.log
+logs/
+
+# ==================== Docker ====================
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# ==================== CI/CD ====================
+.github/
+
+# ==================== OS Files ====================
+.DS_Store
+Thumbs.db
+
+# ==================== Temporary Files ====================
+tmp/
+temp/
+*.tmp
+.cache/
+
+# ==================== Data (Optional - uncomment if you don't want data in container) ====================
+# data/*.csv

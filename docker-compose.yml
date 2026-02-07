@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # Streamlit Web Application
+  streamlit-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: diabetes-streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # FastAPI REST API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: diabetes-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # MLflow Tracking Server
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    container_name: diabetes-mlflow
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./MLruns:/app/MLruns
+      - mlflow-data:/app/data
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=sqlite:///data/mlflow.db
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=/app/MLruns
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  models:
+  data:
+  mlflow-data:
+
+networks:
+  default:
+    name: diabetes-network

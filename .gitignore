@@ -77,6 +77,9 @@ virtualenv/
 # MLflow experiment tracking data
 MLruns/
 mlruns/
+mlflow.db
+*.db
+mlflow-data/
 
 # ==================== Model Artifacts ====================
 # Uncomment if you want to ignore trained models
