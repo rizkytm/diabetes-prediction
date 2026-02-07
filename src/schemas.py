@@ -21,9 +21,7 @@ class DiabetesInput(BaseModel):
     All fields are validated based on medical knowledge and dataset constraints.
     """
 
-    pregnancies: int = Field(
-        ..., ge=0, le=20, description="Number of times pregnant", example=1
-    )
+    pregnancies: int = Field(..., ge=0, le=20, description="Number of times pregnant", example=1)
 
     glucose: float = Field(
         ...,
@@ -101,13 +99,9 @@ class PredictionResponse(BaseModel):
         ..., ge=0, le=1, description="Predicted class (0=No Diabetes, 1=Diabetes)"
     )
 
-    probability: float = Field(
-        ..., ge=0.0, le=1.0, description="Probability of having diabetes"
-    )
+    probability: float = Field(..., ge=0.0, le=1.0, description="Probability of having diabetes")
 
-    risk_level: str = Field(
-        ..., description="Risk category: Low, Moderate, High, or Very High"
-    )
+    risk_level: str = Field(..., description="Risk category: Low, Moderate, High, or Very High")
 
     confidence: str = Field(..., description="Confidence level based on probability")
 

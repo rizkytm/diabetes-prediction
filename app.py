@@ -150,9 +150,7 @@ def main():
     """Main application."""
 
     # Header
-    st.markdown(
-        '<h1 class="main-header">[Diabetes] Prediction</h1>', unsafe_allow_html=True
-    )
+    st.markdown('<h1 class="main-header">[Diabetes] Prediction</h1>', unsafe_allow_html=True)
     st.markdown("---")
 
     # Load models
@@ -274,9 +272,7 @@ def main():
             )
 
         # Submit button
-        submit = st.form_submit_button(
-            "[Predict] Diabetes Risk", use_container_width=True
-        )
+        submit = st.form_submit_button("[Predict] Diabetes Risk", use_container_width=True)
 
     # Prediction
     if submit:
@@ -386,9 +382,7 @@ def main():
 
         # BMI-based recommendations
         if bmi >= 30:
-            recommendations.append(
-                "[!] **BMI indicates obesity** - Weight management recommended"
-            )
+            recommendations.append("[!] **BMI indicates obesity** - Weight management recommended")
         elif bmi >= 25:
             recommendations.append(
                 "[!] **BMI indicates overweight** - Consider healthy weight loss"
@@ -396,21 +390,15 @@ def main():
 
         # Blood pressure recommendations
         if blood_pressure > 90:
-            recommendations.append(
-                "[!] **Blood pressure elevated** - Regular monitoring advised"
-            )
+            recommendations.append("[!] **Blood pressure elevated** - Regular monitoring advised")
 
         # Age-based recommendations
         if age > 45:
-            recommendations.append(
-                "[!] **Age over 45** - Regular diabetes screening recommended"
-            )
+            recommendations.append("[!] **Age over 45** - Regular diabetes screening recommended")
 
         # General recommendations
         if len(recommendations) == 0:
-            recommendations.append(
-                "[OK] All parameters within normal range - Keep it up!"
-            )
+            recommendations.append("[OK] All parameters within normal range - Keep it up!")
 
         for rec in recommendations:
             st.markdown(f"- {rec}")

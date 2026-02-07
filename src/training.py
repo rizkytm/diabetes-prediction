@@ -566,9 +566,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Train diabetes prediction models")
-    parser.add_argument(
-        "--data", type=str, default="data/diabetes.csv", help="Path to dataset"
-    )
+    parser.add_argument("--data", type=str, default="data/diabetes.csv", help="Path to dataset")
     parser.add_argument(
         "--models",
         nargs="+",

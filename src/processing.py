@@ -214,8 +214,7 @@ def create_preprocessing_pipeline(
     valid_strategies = ["mean", "median", "most_frequent", "constant"]
     if imputer_strategy not in valid_strategies:
         raise ValueError(
-            f"Invalid imputer_strategy: {imputer_strategy}. "
-            f"Must be one of {valid_strategies}"
+            f"Invalid imputer_strategy: {imputer_strategy}. " f"Must be one of {valid_strategies}"
         )
 
     # Build pipeline steps

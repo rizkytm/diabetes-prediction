@@ -75,9 +75,7 @@ async def startup_event():
         pipeline_path = "models/preprocessing_pipeline.pkl"
         if not os.path.exists(pipeline_path):
             logger.error(f"[ERROR] Preprocessing pipeline not found: {pipeline_path}")
-            raise FileNotFoundError(
-                f"Preprocessing pipeline not found: {pipeline_path}"
-            )
+            raise FileNotFoundError(f"Preprocessing pipeline not found: {pipeline_path}")
 
         pipeline = joblib.load(pipeline_path)
         logger.info(f"[OK] Preprocessing pipeline loaded from: {pipeline_path}")
@@ -174,38 +172,26 @@ def get_recommendations(input_data: dict) -> List[str]:
     # Glucose-based recommendations
     glucose = input_data.get("Glucose", 0)
     if glucose > 140:
-        recommendations.append(
-            "[!] Glucose level elevated - Consider reducing sugar intake"
-        )
+        recommendations.append("[!] Glucose level elevated - Consider reducing sugar intake")
     elif glucose > 125:
-        recommendations.append(
-            "[!] Glucose level above normal - Monitor blood sugar regularly"
-        )
+        recommendations.append("[!] Glucose level above normal - Monitor blood sugar regularly")
 
     # BMI-based recommendations
     bmi = input_data.get("BMI", 0)
     if bmi >= 30:
-        recommendations.append(
-            "[!] BMI indicates obesity - Weight management recommended"
-        )
+        recommendations.append("[!] BMI indicates obesity - Weight management recommended")
     elif bmi >= 25:
-        recommendations.append(
-            "[!] BMI indicates overweight - Consider healthy weight loss"
-        )
+        recommendations.append("[!] BMI indicates overweight - Consider healthy weight loss")
 
     # Blood pressure recommendations
     blood_pressure = input_data.get("BloodPressure", 0)
     if blood_pressure > 90:
-        recommendations.append(
-            "[!] Blood pressure elevated - Regular monitoring advised"
-        )
+        recommendations.append("[!] Blood pressure elevated - Regular monitoring advised")
 
     # Age-based recommendations
     age = input_data.get("Age", 0)
     if age > 45:
-        recommendations.append(
-            "[!] Age over 45 - Regular diabetes screening recommended"
-        )
+        recommendations.append("[!] Age over 45 - Regular diabetes screening recommended")
 
     # General recommendations
     if len(recommendations) == 0:
@@ -384,9 +370,7 @@ async def predict_batch(batch_input: BatchPredictionInput):
         )
 
 
-@app.get(
-    "/model-info", response_model=ModelInfoResponse, status_code=status.HTTP_200_OK
-)
+@app.get("/model-info", response_model=ModelInfoResponse, status_code=status.HTTP_200_OK)
 async def get_model_info():
     """
     Get information about the loaded model.

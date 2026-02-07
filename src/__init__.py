@@ -39,13 +39,13 @@ __all__ = [
 ]
 
 # Export schemas for API usage
+from src.schemas import PredictionResponse  # noqa: F401
 from src.schemas import (  # noqa: F401
     BatchPredictionInput,
     BatchPredictionResponse,
     DiabetesInput,
     HealthResponse,
     ModelInfoResponse,
-    PredictionResponse,
 )
 
 __all__.extend(
