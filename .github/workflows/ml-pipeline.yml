@@ -102,7 +102,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [streamlit, api]
+        service: [streamlit, api, mlflow]
 
     steps:
     - name: Checkout code
@@ -136,7 +136,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
-        file: ${{ matrix.service == 'api' && 'Dockerfile.api' || 'Dockerfile' }}
+        file: ${{ matrix.service == 'api' && 'Dockerfile.api' || (matrix.service == 'mlflow' && 'Dockerfile.mlflow' || 'Dockerfile') }}
         push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
