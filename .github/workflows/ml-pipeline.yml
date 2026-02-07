@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+# Permissions for security scanning
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   # ==================== JOB 1: Lint & Code Quality ====================
   lint:
@@ -163,6 +169,7 @@ jobs:
     name: Security Vulnerability Scan
     runs-on: ubuntu-latest
     needs: build
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
 
     steps:
     - name: Checkout code
@@ -177,9 +184,11 @@ jobs:
         output: 'trivy-results.sarif'
 
     - name: Upload Trivy results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v4
+      continue-on-error: true
       with:
         sarif_file: 'trivy-results.sarif'
+        category: 'trivy'
 
   # ==================== JOB 5: Deploy (Optional) ====================
   deploy:
